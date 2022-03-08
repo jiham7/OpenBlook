@@ -1,6 +1,7 @@
 How to design for MVP? Top down (create interfaces) or down up? 
-How to handle dates? 
+How to handle dates? (epoch, block #)
 how to handle counters or id random generation? 
 for voting, can there by more than just yes and no? 
 current contracts with examples of good design ?
 mixing backend code with contract work? for example having a backend keep track of orgs that paid ?
+Best front end? Parcel? React, Vue, Svelte
