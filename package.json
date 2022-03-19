@@ -22,5 +22,8 @@
     "prettier-plugin-solidity": "^1.0.0-beta.13",
     "solhint": "^3.3.7",
     "solidity-coverage": "^0.7.20"
+  },
+  "dependencies": {
+    "@gnosis.pm/safe-core-sdk": "^2.0.0"
   }
 }

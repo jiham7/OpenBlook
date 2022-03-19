@@ -11,7 +11,6 @@ contract Organization{
 
     uint256 public trxIdCounter;
     uint256 public proposalIdCounter;
-    uint256 public userIdCounter;
 
     Proposal[] public proposals;
     FinanceTxn[] public transactions;
@@ -34,21 +33,22 @@ contract Organization{
         uint256 id;
         uint256 orgId;
         uint256 datetime;
+        uint256 amount;
         address creator;
         address[] approvers;
         string from;
         string to;
-        uint256 amount;
         string description;
         string[] ipfsHashes;
         Status status;
     }
     
     enum VotingStatus {
-        WaitingApproval,
+        AwaitingApproval,
         InProgress,
         Finished
     }
+
     struct Proposal {
         uint256 id;
         string description;
@@ -64,7 +64,7 @@ contract Organization{
         uint256 noCounter;
         string[] ipfsHashes;
     }
-    // maybe have mapping(uint256 orgId => transactions)
+
     constructor(uint256 _id, string memory _name) {
         id = _id;
         name = _name;
@@ -93,8 +93,21 @@ contract Organization{
         emit TxnCreated(newId, _to, _from);
     }
 
+    event ChangeTxnStatus(uint256 id, Status status);
+    function changeTxnStatus(Status _status, FinanceTxn memory _txn) public {
+        // TODO: mapping of transactionId => transaction struct
+        // input as id instead of entire struct
+        for(uint256 i=0; i<transactions.length; i++){
+            if(equals(transactions[i], _txn)){
+                transactions[i].status = _status;
+                break;
+            }
+        }
+        emit ChangeTxnStatus(_txn.id, _status);
+    }
+
     event ProposalCreated(uint256 id, address creator, string question);
-    function createProposal(address[] memory _approvers, string memory _question, string memory _reason, string memory _description, string[] memory _ipfsHashes) public {
+    function createProposal(address[] memory _approvers, string calldata _question, string memory _reason, string memory _description, string[] memory _ipfsHashes) public {
         uint256 newId = proposalIdCounter;
         proposalIdCounter++;
         Proposal storage proposal = proposals.push();
@@ -106,7 +119,7 @@ contract Organization{
         proposal.reason = _reason;
         proposal.description = _description;
         proposal.isFinal = false;
-        proposal.votingStatus = VotingStatus.WaitingApproval;
+        proposal.votingStatus = VotingStatus.AwaitingApproval;
         proposal.ipfsHashes = _ipfsHashes;
         proposal.status = Status.AwaitingApproval;
         proposal.yesCounter = 0;
@@ -114,10 +127,16 @@ contract Organization{
         emit ProposalCreated(newId, msg.sender, _question);
     }
 
+    event AddMember(string firstName, string lastName);
     function addMember(string memory _firstName, string memory _lastName) public {
         User storage user = members.push();
         user.firstName = _firstName;
         user.lastName = _lastName;
         user.userAddress = msg.sender;
+        emit AddMember(_firstName, _lastName);
+    }
+
+    function equals(FinanceTxn memory _first, FinanceTxn memory _second) pure public returns (bool) {
+        return(keccak256(abi.encodePacked(_first.id, _first.orgId)) == keccak256(abi.encodePacked(_second.id, _second.orgId)));
     }
 }

@@ -12,6 +12,9 @@ contract TransactionLedger {
 
     struct User {
         uint256 userId;
+        address userAddress;
+        string firstName;
+        string lastName;
     }
 
     struct FinanceTxn {
