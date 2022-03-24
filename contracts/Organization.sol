@@ -44,6 +44,7 @@ contract Organization{
         string description;
         string[] ipfsHashes;
         Status status;
+        uint256 confirmations;
     }
     
     enum VotingStatus {
@@ -66,6 +67,7 @@ contract Organization{
         uint256 yesCounter;
         uint256 noCounter;
         string[] ipfsHashes;
+        uint256 confirmations;
     }
 
     constructor(uint256 _id, string memory _name) {
@@ -82,7 +84,7 @@ contract Organization{
     function createFinanceTxn(address[] memory _approvers, string memory _from, string memory _to, uint256 _amount, string memory _description, string[] memory _ipfsHashes) public returns(uint256){
         uint256 newId = trxIdCounter;
         trxIdCounter++;
-        transactions[newId] = FinanceTxn(newId, id, block.timestamp, _amount, msg.sender, _approvers, _from, _to, _description, _ipfsHashes, Status.AwaitingApproval);
+        transactions[newId] = FinanceTxn(newId, id, block.timestamp, _amount, msg.sender, _approvers, _from, _to, _description, _ipfsHashes, Status.AwaitingApproval, 0);
         // FinanceTxn storage txn = transactions.push();
         // txn.id = newId;
         // txn.datetime = block.timestamp;
@@ -106,6 +108,7 @@ contract Organization{
         // input as id instead of entire struct
         require(keccak256(abi.encodePacked(_status)) == keccak256(abi.encodePacked("InProgress")) || keccak256(abi.encodePacked(_status)) == keccak256(abi.encodePacked("Rejected")), "Wrong input");
         if(keccak256(abi.encodePacked(_status)) == keccak256(abi.encodePacked("InProgress"))) {
+            require(isTxnApproved(_id),"Txn not approved");
             transactions[_id].status = Status.InProgress;
         }
         else if(keccak256(abi.encodePacked(_status)) == keccak256(abi.encodePacked("Rejected"))) {
@@ -122,7 +125,7 @@ contract Organization{
         uint256 newId = proposalIdCounter;
         proposalIdCounter++;
         // Proposal storage proposal = proposals.push();
-        proposals[newId] = Proposal(newId, _description, block.timestamp, msg.sender, _approvers, _question, _reason, false, VotingStatus.AwaitingApproval, Status.AwaitingApproval, 0, 0, _ipfsHashes);
+        proposals[newId] = Proposal(newId, _description, block.timestamp, msg.sender, _approvers, _question, _reason, false, VotingStatus.AwaitingApproval, Status.AwaitingApproval, 0, 0, _ipfsHashes, 0);
         // proposal.id = newId;
         // proposal.datetime = block.timestamp;
         // proposal.creator = msg.sender;
@@ -147,6 +150,41 @@ contract Organization{
         user.userAddress = msg.sender;
         emit AddMember(_firstName, _lastName);
     }
+
+    function approveTransaction(uint256 _txnId) public{
+        require(isApprover(_txnId), "Caller is not an approver");
+        transactions[_txnId].confirmations++;
+    }
+
+    function isApprover(uint256 _txnId) public view returns(bool){
+        for(uint i=0; i<transactions[_txnId].approvers.length; i++) {
+            if(msg.sender == transactions[_txnId].approvers[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function isTxnApproved(uint256 _txnId) public view returns(bool){
+        if(transactions[_txnId].confirmations == transactions[_txnId].approvers.length) {
+            return true;
+        }
+        return false;
+    }
+
+    function getTxnStatus(uint256 _txnId) public view returns(string memory){
+        if(transactions[_txnId].status == Status.AwaitingApproval) {
+            return "AwaitingApproval";
+        }
+        else if(transactions[_txnId].status == Status.InProgress) {
+            return "InProgress";
+        }
+        else if(transactions[_txnId].status == Status.Rejected) {
+            return "Rejected";
+        }
+        return "Completed";
+    }
+
 
     // function getTxn(uint256 _id) public view returns(uint256,
     //     uint256,

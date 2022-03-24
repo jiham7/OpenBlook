@@ -7,6 +7,7 @@ const hre = require("hardhat");
 
 
 async function main() {
+  const [owner, addr1, addr2] = await ethers.getSigners();
   // Hardhat always runs the compile task when running scripts with its command
   // line interface.
   //
@@ -36,7 +37,7 @@ async function main() {
 
 
   const _orgId = 2;
-  const _approvers = ['0xd586E9ed4f7F6bd6e49194CfaDD063431BCE3E73', '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'];
+  const _approvers = [addr1.address, addr2.address];
   const _from = '0x70997970c51812dc3a010c7d01b50e0d17dc79c8';
   const _to = '0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc';
   const _amount = 1000;
@@ -44,10 +45,24 @@ async function main() {
   const _ipfsHashes = ['testImage', 'testImage2', 'testImage3'];
 
   const newTxn = await org.createFinanceTxn(_approvers, _from, _to, _amount, _description, _ipfsHashes);
-  console.log(newTxn);
+  // console.log(newTxn);
+
+  // First approver
+  const signer1 = await ethers.getSigner(addr1.address);
+  const myContract = await ethers.getContractAt('Organization', org.address, signer1);
+  const checkStatus1 = await myContract.getTxnStatus(0);
+  console.log(checkStatus1);
+  const out = await myContract.approveTransaction(0);
   
+  // Second Approver
+  const signer2 = await ethers.getSigner(addr2.address);
+  const myContract2 = await ethers.getContractAt('Organization', org.address, signer1);
+  const out2 = await myContract2.approveTransaction(0);
+
   const changeStatus = await org.changeTxnStatus(0, "InProgress");
-  console.log(changeStatus);
+
+  const checkStatus2 = await myContract2.getTxnStatus(0);
+  console.log(checkStatus2);
 
 
   
