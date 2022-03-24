@@ -2,17 +2,18 @@
 pragma solidity ^0.8.0;
 
 import "./Organization.sol";
-contract Factory{
+contract OrgFactory{
     Organization[] public organizations;
     uint256 public orgIdCounter;
 
     event OrgnizationCreated(address orgAddress, uint256 id, string name);
-    function createOrganization(string memory _name) external{
+    function createOrganization(string memory _name) external returns(address){
         uint256 _id = orgIdCounter;
         orgIdCounter++;
         Organization organization = new Organization(_id, _name);
         organizations.push(organization);
         emit OrgnizationCreated(address(organization), _id, _name);
+        return address(organization);
     }
  
 }

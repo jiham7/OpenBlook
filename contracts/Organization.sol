@@ -12,8 +12,11 @@ contract Organization{
     uint256 public trxIdCounter;
     uint256 public proposalIdCounter;
 
-    Proposal[] public proposals;
-    FinanceTxn[] public transactions;
+    // Proposal[] public proposals;
+    mapping(uint => Proposal) public proposals;
+
+    // FinanceTxn[] public transactions;
+    mapping(uint => FinanceTxn) public transactions;
 
 
     enum Status {
@@ -76,54 +79,63 @@ contract Organization{
     }
 
     event TxnCreated(uint256 id, string to, string from);
-    function createFinanceTxn(address[] memory _approvers, string memory _from, string memory _to, uint256 _amount, string memory _description, string[] memory _ipfsHashes) public {
+    function createFinanceTxn(address[] memory _approvers, string memory _from, string memory _to, uint256 _amount, string memory _description, string[] memory _ipfsHashes) public returns(uint256){
         uint256 newId = trxIdCounter;
         trxIdCounter++;
-        FinanceTxn storage txn = transactions.push();
-        txn.id = newId;
-        txn.datetime = block.timestamp;
-        txn.creator = msg.sender;
-        txn.approvers = _approvers;
-        txn.from = _from;
-        txn.to = _to;
-        txn.amount = _amount;
-        txn.description = _description;
-        txn.ipfsHashes = _ipfsHashes;
-        txn.status = Status.AwaitingApproval;
+        transactions[newId] = FinanceTxn(newId, id, block.timestamp, _amount, msg.sender, _approvers, _from, _to, _description, _ipfsHashes, Status.AwaitingApproval);
+        // FinanceTxn storage txn = transactions.push();
+        // txn.id = newId;
+        // txn.datetime = block.timestamp;
+        // txn.creator = msg.sender;
+        // txn.approvers = _approvers;
+        // txn.from = _from;
+        // txn.to = _to;
+        // txn.amount = _amount;
+        // txn.description = _description;
+        // txn.ipfsHashes = _ipfsHashes;
+        // txn.status = Status.AwaitingApproval;
         emit TxnCreated(newId, _to, _from);
+        return newId;
     }
-
-    event ChangeTxnStatus(uint256 id, Status status);
-    function changeTxnStatus(Status _status, FinanceTxn memory _txn) public {
+    
+    
+    //
+    event ChangeTxnStatus(uint256 _id, string _status);
+    function changeTxnStatus(uint256 _id, string memory _status) public {
         // TODO: mapping of transactionId => transaction struct
         // input as id instead of entire struct
-        for(uint256 i=0; i<transactions.length; i++){
-            if(equals(transactions[i], _txn)){
-                transactions[i].status = _status;
-                break;
-            }
+        require(keccak256(abi.encodePacked(_status)) == keccak256(abi.encodePacked("InProgress")) || keccak256(abi.encodePacked(_status)) == keccak256(abi.encodePacked("Rejected")), "Wrong input");
+        if(keccak256(abi.encodePacked(_status)) == keccak256(abi.encodePacked("InProgress"))) {
+            transactions[_id].status = Status.InProgress;
         }
-        emit ChangeTxnStatus(_txn.id, _status);
+        else if(keccak256(abi.encodePacked(_status)) == keccak256(abi.encodePacked("Rejected"))) {
+            transactions[_id].status = Status.Rejected;
+        }
+        else {
+            transactions[_id].status = Status.Completed;
+        }
+        emit ChangeTxnStatus(id, _status);
     }
 
     event ProposalCreated(uint256 id, address creator, string question);
     function createProposal(address[] memory _approvers, string calldata _question, string memory _reason, string memory _description, string[] memory _ipfsHashes) public {
         uint256 newId = proposalIdCounter;
         proposalIdCounter++;
-        Proposal storage proposal = proposals.push();
-        proposal.id = newId;
-        proposal.datetime = block.timestamp;
-        proposal.creator = msg.sender;
-        proposal.approvers = _approvers;
-        proposal.question = _question;
-        proposal.reason = _reason;
-        proposal.description = _description;
-        proposal.isFinal = false;
-        proposal.votingStatus = VotingStatus.AwaitingApproval;
-        proposal.ipfsHashes = _ipfsHashes;
-        proposal.status = Status.AwaitingApproval;
-        proposal.yesCounter = 0;
-        proposal.noCounter = 0;
+        // Proposal storage proposal = proposals.push();
+        proposals[newId] = Proposal(newId, _description, block.timestamp, msg.sender, _approvers, _question, _reason, false, VotingStatus.AwaitingApproval, Status.AwaitingApproval, 0, 0, _ipfsHashes);
+        // proposal.id = newId;
+        // proposal.datetime = block.timestamp;
+        // proposal.creator = msg.sender;
+        // proposal.approvers = _approvers;
+        // proposal.question = _question;
+        // proposal.reason = _reason;
+        // proposal.description = _description;
+        // proposal.isFinal = false;
+        // proposal.votingStatus = VotingStatus.AwaitingApproval;
+        // proposal.ipfsHashes = _ipfsHashes;
+        // proposal.status = Status.AwaitingApproval;
+        // proposal.yesCounter = 0;
+        // proposal.noCounter = 0;
         emit ProposalCreated(newId, msg.sender, _question);
     }
 
@@ -136,7 +148,35 @@ contract Organization{
         emit AddMember(_firstName, _lastName);
     }
 
-    function equals(FinanceTxn memory _first, FinanceTxn memory _second) pure public returns (bool) {
-        return(keccak256(abi.encodePacked(_first.id, _first.orgId)) == keccak256(abi.encodePacked(_second.id, _second.orgId)));
-    }
+    // function getTxn(uint256 _id) public view returns(uint256,
+    //     uint256,
+    //     uint256,
+    //     uint256,
+    //     address,
+    //     address[],
+    //     string,
+    //     string,
+    //     string,
+    //     string[]){
+    //     return (
+    //         transactions[_id].id,
+    //         transactions[_id].orgId,
+    //         transactions[_id].datetime,
+    //         transactions[_id].amount,
+    //         transactions[_id].creator,
+    //         transactions[_id].approvers,
+    //         transactions[_id].from,
+    //         transactions[_id].to,
+    //         transactions[_id].description,
+    //         transactions[_id].ipfsHashes,
+    //         transactions[_id].status,
+    //     );
+    // }
+    // function equals(FinanceTxn memory _first, FinanceTxn memory _second) pure public returns (bool) {
+    //     return(keccak256(abi.encodePacked(_first.id, _first.orgId)) == keccak256(abi.encodePacked(_second.id, _second.orgId)));
+    // }
+
+    // function equals(FinanceTxn memory _first, FinanceTxn memory _second) pure public returns (bool) {
+    //     return(keccak256(abi.encodePacked(_first.id, _first.orgId)) == keccak256(abi.encodePacked(_second.id, _second.orgId)));
+    // }
 }

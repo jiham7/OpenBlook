@@ -5,6 +5,7 @@
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
 
+
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
   // line interface.
@@ -24,7 +25,14 @@ async function main() {
   console.log("Org Factory contract deployed to: ", orgFactory.address);
 
   //Org Contract Creation
-  const orgAddress = await orgFactory.createOrganization("ChainshotOrg");
+  // const orgAddress = await orgFactory.createOrganization("ChainshotOrg");
+  // console.log("Organization contract deployed to: ", orgAddress);
+
+  const Organization = await hre.ethers.getContractFactory("Organization");
+  const org = await Organization.deploy(1, "ChainShot");
+  
+  await org.deployed();
+  console.log("Org contract deployed to: ", org.address);
 
 
   const _orgId = 2;
@@ -33,13 +41,19 @@ async function main() {
   const _to = '0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc';
   const _amount = 1000;
   const _description = "testing desc";
-  const _ipfsHashes = ['test1', 'test2', 'test3'];
+  const _ipfsHashes = ['testImage', 'testImage2', 'testImage3'];
 
-  const newTxn = await orgAddress.newFinanceTxn(_orgId, _approvers, _from, _to, _amount, _description, _ipfsHashes);
+  const newTxn = await org.createFinanceTxn(_approvers, _from, _to, _amount, _description, _ipfsHashes);
+  console.log(newTxn);
+  
+  const changeStatus = await org.changeTxnStatus(0, "InProgress");
+  console.log(changeStatus);
+
+
   
 
-  const trxCount = await ledger.getTrxNumber();
-  console.log("Trx count: " + trxCount);
+  // const trxCount = await org.getTrxNumber();
+  // console.log("Trx count: " + trxCount);
 
 }
 
