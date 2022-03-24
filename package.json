@@ -24,6 +24,8 @@
     "solidity-coverage": "^0.7.20"
   },
   "dependencies": {
-    "@gnosis.pm/safe-core-sdk": "^2.0.0"
+    "@gnosis.pm/safe-core-sdk": "^2.0.0",
+    "@openzeppelin/contracts": "^4.5.0",
+    "@optionality.io/clone-factory": "^0.2.1"
   }
 }

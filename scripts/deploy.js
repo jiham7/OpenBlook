@@ -14,11 +14,17 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const TxnLedger = await hre.ethers.getContractFactory("TransactionLedger");
-  const ledger = await TxnLedger.deploy();
+
+  // Factory Contract Creation
+  const OrganizationFactory = await hre.ethers.getContractFactory("OrgFactory");
+  const orgFactory = await OrganizationFactory.deploy();
   
 
-  await ledger.deployed();
+  await orgFactory.deployed();
+  console.log("Org Factory contract deployed to: ", orgFactory.address);
+
+  //Org Contract Creation
+  const orgAddress = await orgFactory.createOrganization("ChainshotOrg");
 
 
   const _orgId = 2;
@@ -29,7 +35,7 @@ async function main() {
   const _description = "testing desc";
   const _ipfsHashes = ['test1', 'test2', 'test3'];
 
-  const newTxn = await ledger.newFinanceTxn(_orgId, _approvers, _from, _to, _amount, _description, _ipfsHashes);
+  const newTxn = await orgAddress.newFinanceTxn(_orgId, _approvers, _from, _to, _amount, _description, _ipfsHashes);
   
 
   const trxCount = await ledger.getTrxNumber();
