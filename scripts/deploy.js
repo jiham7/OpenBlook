@@ -58,7 +58,8 @@ async function main() {
   console.log("Attemping to change Status to InProgress");
 
   // Change Status
-  const checkStatus2 = await orgContract.changeTxnStatus(0, "InProgress");
+  const changeStatus = await orgContract.changeTxnStatus(0, "InProgress");
+  const checkStatus2 = await orgContract.getTxnStatus(0);
   console.log("Current Status:" + checkStatus2);
 
 }
