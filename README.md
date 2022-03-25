@@ -1,42 +1,8 @@
-# Advanced Sample Hardhat Project
+# OpenBlook
 
-This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
+I'm building a public, transparent ledger platform where users can input data to keep track of decisions 
+made by the org and by whom. The two methods this will be accomplished are through storing data into the blockchain and using DAOs for voting. For tracking financials, when money is moved, users input the transaction data with supporting documents. API integration with Plaid would also show previous bank transactions for support. Then data can be signed by multiple parties as a DAO to validate before being input into the blockchain. When a member or investor wants to see how financials are handled, they openly see the chain of data without contacting members, rummaging through documents with trust and they would be charged per transaction.
 
-The project comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts. It also comes with a variety of other tools, preconfigured to work with the project code.
+Inspired by mismanagement of money from my father's church, it removes the risk of trusting one or a group of members to handle financials for the entire org and enforcing transparency. This allows members and investors to openly see the decisions made by the leaders of the org and minimize shady activity. Outside of financial transactions, the DAO system allows members not even in leadership to vote on important decisions and see that the majority-voted decisions are followed through properly. This decentralized app will allow for a trusted book-keeping system to enable for more successful and honest businesses where org members are made accountable and data is easily traceable. 
 
-Try running some of the following tasks:
-
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-npx hardhat help
-REPORT_GAS=true npx hardhat test
-npx hardhat coverage
-npx hardhat run scripts/deploy.js
-node scripts/deploy.js
-npx eslint '**/*.js'
-npx eslint '**/*.js' --fix
-npx prettier '**/*.{json,sol,md}' --check
-npx prettier '**/*.{json,sol,md}' --write
-npx solhint 'contracts/**/*.sol'
-npx solhint 'contracts/**/*.sol' --fix
-```
-
-# Etherscan verification
-
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
-
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
-
-```shell
-hardhat run --network ropsten scripts/deploy.js
-```
-
-Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
-
-```shell
-npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
-```
+It removes the risk of trusting one or a group to handle financials for the entire org and enforcing transparency. This allows members and investors to openly see the decisions made by the leaders of the org and minimize shady activity. The DAO allows members not even in leadership to vote on important decisions and see that the majority-voted decisions are followed through properly. This dapp will allow for book-keeping system to enable successful bussiness where data is openly traceable. 
