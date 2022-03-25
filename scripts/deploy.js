@@ -1,4 +1,5 @@
 const hre = require("hardhat");
+const { ethers, upgrades } = require("hardhat");
 
 
 async function main() {
@@ -15,7 +16,7 @@ async function main() {
   // Creator
   const ownerSigner = await ethers.getSigner(owner.address);
   const factoryContract = await ethers.getContractAt('OrgFactory', orgFactory.address, ownerSigner);
-  
+
   // Create new Organization from Factory
   const newOrg = await factoryContract.createOrganization("ChainshotOrg");
   const newAddress = await factoryContract.getOrgAddress(0);
@@ -46,9 +47,9 @@ async function main() {
   const out = await myContract.approveTransaction(0);
   console.log("Txn approved by " + addr1.address);
   
-  // Attempt to change Status. Not going to work
-  console.log("Attemping to change Status to InProgress");
-  const changeStatus1 = await orgContract.changeTxnStatus(0, "InProgress");
+  // // Attempt to change Status. Not going to work
+  // console.log("Attemping to change Status to InProgress");
+  // const changeStatus1 = await orgContract.changeTxnStatus(0, "InProgress");
   
   // Second Approver
   const signer2 = await ethers.getSigner(addr2.address);
@@ -58,7 +59,8 @@ async function main() {
   console.log("Attemping to change Status to InProgress");
 
   // Change Status
-  const checkStatus2 = await orgContract.changeTxnStatus(0, "InProgress");
+  const statusChange = await orgContract.changeTxnStatus(0, "InProgress");
+  const checkStatus2 = await orgContract.getTxnStatus(0);
   console.log("Current Status:" + checkStatus2);
 
 }

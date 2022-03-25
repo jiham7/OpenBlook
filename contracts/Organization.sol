@@ -1,7 +1,9 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-contract Organization{
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+
+contract Organization is Initializable{
     uint256 public id;
     uint256 public balance;
     uint256 public credits;
@@ -70,7 +72,7 @@ contract Organization{
         uint256 confirmations;
     }
 
-    constructor(uint256 _id, string memory _name) {
+    function initialize(uint256 _id, string memory _name) public initializer{
         id = _id;
         name = _name;
         balance = 0;
@@ -79,6 +81,15 @@ contract Organization{
         orgApprovers.push(admin);
         members.push(admin);
     }
+    // constructor(uint256 _id, string memory _name) {
+    //     id = _id;
+    //     name = _name;
+    //     balance = 0;
+    //     credits = 0;
+    //     User memory admin = User(msg.sender, "admin", "admin");
+    //     orgApprovers.push(admin);
+    //     members.push(admin);
+    // }
 
     event TxnCreated(uint256 id, string to, string from);
     function createFinanceTxn(address[] memory _approvers, string memory _from, string memory _to, uint256 _amount, string memory _description, string[] memory _ipfsHashes) public returns(uint256){
