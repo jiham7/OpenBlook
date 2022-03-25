@@ -1,5 +1,7 @@
 # OpenBlook
 
+Link to slides: https://docs.google.com/presentation/d/1_S5PyHkfycuJ99BPMK8RiR7c6ca1LTlSXlXuXb0liBk/edit?usp=sharing
+
 I'm building a public, transparent ledger platform where users can input data to keep track of decisions 
 made by the org and by whom. The two methods this will be accomplished are through storing data into the blockchain and using DAOs for voting. For tracking financials, when money is moved, users input the transaction data with supporting documents. API integration with Plaid would also show previous bank transactions for support. Then data can be signed by multiple parties as a DAO to validate before being input into the blockchain. When a member or investor wants to see how financials are handled, they openly see the chain of data without contacting members, rummaging through documents with trust and they would be charged per transaction.
 
